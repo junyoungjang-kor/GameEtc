@@ -163,7 +163,7 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
 /* MUSIC (APPLE MUSIC) CARD */
 .music-card { grid-column: 1; grid-row: 3; animation-delay: 0.3s; }
 .music-card .iframe-wrap { display: flex; gap: 0; }
-.music-card .iframe-wrap iframe { height: 450px; }
+.music-card .iframe-wrap iframe { width: 100%; height: 450px; }
 .music-card .iframe-placeholder { min-height: 200px; }
 
 /* QUICK LINKS */
@@ -525,14 +525,13 @@ function extractCalendarId(input){
 function extractAppleMusicUrl(input){
   input=input.trim();
   if(!input)return '';
-  // music.apple.com → embed.music.apple.com
+  if(input.includes('embed.music.apple.com'))return input;
   if(input.includes('music.apple.com')){
     return input.replace('music.apple.com','embed.music.apple.com');
   }
-  // 이미 embed URL이면 그대로
-  if(input.includes('embed.music.apple.com'))return input;
   return input;
 }
+
 
 function applyConnections(){
   // Google Calendar
@@ -568,6 +567,7 @@ function applyConnections(){
     if(oldIframe)oldIframe.remove();
     const iframe=document.createElement('iframe');
     iframe.src=config.appleMusicUrl;
+    iframe.style.width='100%';
     iframe.style.height='450px';
     iframe.setAttribute('frameborder','0');
     iframe.setAttribute('allow','autoplay *; encrypted-media *; fullscreen *; clipboard-write');
