@@ -525,7 +525,9 @@ function extractCalendarId(input){
 function extractAppleMusicUrl(input){
   input=input.trim();
   if(!input)return '';
+  // 이미 embed URL이면 그대로 (이 체크를 먼저!)
   if(input.includes('embed.music.apple.com'))return input;
+  // music.apple.com → embed.music.apple.com
   if(input.includes('music.apple.com')){
     return input.replace('music.apple.com','embed.music.apple.com');
   }
