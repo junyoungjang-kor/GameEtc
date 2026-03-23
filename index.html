@@ -531,7 +531,9 @@ function extractAppleMusicUrl(input){
   if(input.includes('music.apple.com')){
     return input.replace('music.apple.com','embed.music.apple.com');
   }
-  return input;
+  // Apple Music이 아닌 URL은 거부
+  alert('Apple Music 링크만 입력할 수 있습니다.\n예: https://music.apple.com/kr/playlist/...');
+  return '';
 }
 
 
@@ -550,6 +552,8 @@ function applyConnections(){
     iframe.style.height='600px';
     iframe.setAttribute('frameborder','0');
     iframe.setAttribute('scrolling','no');
+    iframe.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups');
+    iframe.onerror=()=>{calPlaceholder.style.display='';calPlaceholder.querySelector('.placeholder-text').innerHTML='캘린더를 불러올 수 없습니다<br>브라우저 보안 정책(X-Frame-Options)으로<br>차단되었을 수 있습니다<br><a href="https://calendar.google.com" target="_blank" style="color:var(--accent-blue);">Google 캘린더에서 직접 열기 →</a>';};
     calWrap.appendChild(iframe);
     calStatus.className='status-dot connected';
   } else {
@@ -591,14 +595,18 @@ applyConnections();
 let todos=JSON.parse(localStorage.getItem('jangHQ_todos')||'[]');
 // 구버전 데이터 마이그레이션 (done boolean → status string)
 todos=todos.map(t=>{if(t.status===undefined){t.status=t.done?'done':'active';delete t.done;if(!t.dueDate)t.dueDate='';}return t;});
-if(!todos.length){
-  todos=[
-    {id:1,text:'보고서 제출',status:'active',priority:'high',dueDate:'2026-03-14'},
-    {id:2,text:'식재료 구매',status:'active',priority:'mid',dueDate:'2026-03-12'},
-    {id:3,text:'일본어 단어 복습',status:'done',priority:'low',dueDate:''},
-    {id:4,text:'운동 루틴 완료',status:'delayed',priority:'mid',dueDate:'2026-03-10'},
-    {id:5,text:'가족 사진 정리',status:'postponed',priority:'low',dueDate:''},
-  ];
+// 최초 1회만 샘플 데이터 생성 (사용자가 전부 삭제해도 재생성 안 함)
+if(!localStorage.getItem('jangHQ_todos_initialized')){
+  if(!todos.length){
+    todos=[
+      {id:1,text:'보고서 제출',status:'active',priority:'high',dueDate:'2026-03-14'},
+      {id:2,text:'식재료 구매',status:'active',priority:'mid',dueDate:'2026-03-12'},
+      {id:3,text:'일본어 단어 복습',status:'done',priority:'low',dueDate:''},
+      {id:4,text:'운동 루틴 완료',status:'delayed',priority:'mid',dueDate:'2026-03-10'},
+      {id:5,text:'가족 사진 정리',status:'postponed',priority:'low',dueDate:''},
+    ];
+  }
+  localStorage.setItem('jangHQ_todos_initialized','1');
 }
 saveTodos();
 let todoFilter='all', editingTodoId=null;
@@ -653,7 +661,9 @@ function cycleTodoStatus(id){
 }
 function addTodo(){
   const i=document.getElementById('todoInput');
-  openTodoEditor(null,i.value.trim());
+  const text=i.value.trim();
+  if(!text){i.focus();return;}
+  openTodoEditor(null,text);
   i.value='';
 }
 function openTodoEditor(id,preText=''){
@@ -673,13 +683,15 @@ function openTodoEditor(id,preText=''){
   } else {
     document.getElementById('todoTextInput').value=preText;
     document.getElementById('todoDueInput').value='';
+    document.getElementById('todoStartTimeInput').value='';
+    document.getElementById('todoEndTimeInput').value='';
     document.getElementById('todoPriorityInput').value='mid';
     document.getElementById('todoStatusInput').value='active';
     document.getElementById('todoDeleteBtn').style.display='none';
   }
   setTimeout(()=>document.getElementById('todoTextInput').focus(),100);
 }
-function closeTodoEditor(){document.getElementById('todoModal').classList.remove('active');editingTodoId=null;}
+function closeTodoEditor(){document.getElementById('todoModal').classList.remove('active');editingTodoId=null;document.getElementById('todoTextInput').value='';document.getElementById('todoDueInput').value='';document.getElementById('todoStartTimeInput').value='';document.getElementById('todoEndTimeInput').value='';}
 function saveTodoItem(){
   const text=document.getElementById('todoTextInput').value.trim();if(!text)return;
   const dueDate=document.getElementById('todoDueInput').value;
@@ -702,14 +714,18 @@ loadTodos();
 
 // ==================== MEMO ====================
 let memos=JSON.parse(localStorage.getItem('jangHQ_memos')||'[]');
-if(!memos.length){
-  memos=[
-    {id:1,title:'이번 주 업무 목표',body:'보고서 마감, 회의 준비, 일정 조율',category:'work',date:'2026-03-09'},
-    {id:2,title:'가족 여행 계획',body:'숙소 예약 확인, 항공편 체크, 준비물 리스트',category:'family',date:'2026-03-08'},
-    {id:3,title:'운동 기록',body:'케틀벨 스윙 5세트, 덤벨 프레스 4세트',category:'personal',date:'2026-03-07'},
-    {id:4,title:'장보기 목록',body:'김치, 두부, 계란, 우유, 과일',category:'family',date:'2026-03-07'},
-  ];
-  saveMemos();
+// 최초 1회만 샘플 데이터 생성
+if(!localStorage.getItem('jangHQ_memos_initialized')){
+  if(!memos.length){
+    memos=[
+      {id:1,title:'이번 주 업무 목표',body:'보고서 마감, 회의 준비, 일정 조율',category:'work',date:'2026-03-09'},
+      {id:2,title:'가족 여행 계획',body:'숙소 예약 확인, 항공편 체크, 준비물 리스트',category:'family',date:'2026-03-08'},
+      {id:3,title:'운동 기록',body:'케틀벨 스윙 5세트, 덤벨 프레스 4세트',category:'personal',date:'2026-03-07'},
+      {id:4,title:'장보기 목록',body:'김치, 두부, 계란, 우유, 과일',category:'family',date:'2026-03-07'},
+    ];
+    saveMemos();
+  }
+  localStorage.setItem('jangHQ_memos_initialized','1');
 }
 let memoFilter='all',editingMemoId=null;
 function saveMemos(){localStorage.setItem('jangHQ_memos',JSON.stringify(memos));}
@@ -737,7 +753,7 @@ function openMemoEditor(id){
   }
   setTimeout(()=>document.getElementById('memoTitleInput').focus(),100);
 }
-function closeMemoEditor(){document.getElementById('memoModal').classList.remove('active');editingMemoId=null;}
+function closeMemoEditor(){document.getElementById('memoModal').classList.remove('active');editingMemoId=null;document.getElementById('memoTitleInput').value='';document.getElementById('memoBodyInput').value='';}
 function saveMemo(){
   const title=document.getElementById('memoTitleInput').value.trim()||'제목 없음',body=document.getElementById('memoBodyInput').value.trim(),cat=document.getElementById('memoCategorySelect').value,today=new Date().toISOString().slice(0,10);
   if(editingMemoId){const m=memos.find(m=>m.id===editingMemoId);if(m){m.title=title;m.body=body;m.category=cat;m.date=today;}}
