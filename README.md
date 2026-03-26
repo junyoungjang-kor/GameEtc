@@ -134,7 +134,9 @@ git rebase --continue
 
 ```
 GameEtc/
-├── index.html    # 전체 애플리케이션 (HTML + CSS + JS)
-├── README.md     # 이 파일
-└── CLAUDE.md     # AI 작업 가이드
+├── index.html          # 전체 애플리케이션 (HTML + CSS + JS)
+├── README.md           # 이 파일
+├── CLAUDE.md           # AI 작업 가이드
+├── CHANGELOG.md        # 작업 이력 (전체 커밋 기록)
+└── AUDIT_REPORT.md     # 코드 감사 보고서
 ```
