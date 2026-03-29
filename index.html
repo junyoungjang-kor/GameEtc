@@ -440,11 +440,11 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
 </div>
 
 <!-- MEMO EDITOR MODAL -->
-<div class="modal-overlay" id="memoModal">
+<div class="modal-overlay" id="memoModal" role="dialog" aria-modal="true" aria-label="메모 편집">
   <div class="modal-content" style="max-height:80vh;">
     <div class="modal-header">
-      <input type="text" id="memoTitleInput" placeholder="메모 제목..." style="background:none;border:none;color:var(--text-primary);font-family:inherit;font-size:16px;font-weight:600;outline:none;flex:1;">
-      <button class="btn-icon" onclick="closeMemoEditor()">✕</button>
+      <input type="text" id="memoTitleInput" placeholder="메모 제목..." style="background:none;border:none;color:var(--text-primary);font-family:inherit;font-size:16px;font-weight:600;outline:none;flex:1;" aria-label="메모 제목">
+      <button class="btn-icon" onclick="closeMemoEditor()" aria-label="닫기">✕</button>
     </div>
     <div class="modal-body" style="flex:1;overflow-y:auto;">
       <textarea id="memoBodyInput" placeholder="내용을 입력하세요..." style="width:100%;min-height:250px;background:none;border:none;color:var(--text-primary);font-family:'Noto Sans KR',sans-serif;font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea>
@@ -728,6 +728,7 @@ if(!localStorage.getItem('jangHQ_memos_initialized')){
   localStorage.setItem('jangHQ_memos_initialized','1');
 }
 let memoFilter='all',editingMemoId=null;
+const memoDeleteBtn=document.getElementById('memoDeleteBtn');
 function saveMemos(){localStorage.setItem('jangHQ_memos',JSON.stringify(memos));}
 function loadMemos(){
   const list=document.getElementById('memoList');let f=memos;
@@ -746,10 +747,10 @@ function openMemoEditor(id){
   document.getElementById('memoModal').classList.add('active');
   if(id){
     const m=memos.find(m=>m.id===id);
-    if(m){document.getElementById('memoTitleInput').value=m.title;document.getElementById('memoBodyInput').value=m.body;document.getElementById('memoCategorySelect').value=m.category;editingMemoId=id;document.getElementById('memoDeleteBtn').style.display='inline-block';}
+    if(m){document.getElementById('memoTitleInput').value=m.title;document.getElementById('memoBodyInput').value=m.body;document.getElementById('memoCategorySelect').value=m.category;editingMemoId=id;if(memoDeleteBtn)memoDeleteBtn.style.display='inline-block';}
   } else {
     document.getElementById('memoTitleInput').value='';document.getElementById('memoBodyInput').value='';
-    document.getElementById('memoCategorySelect').value='personal';editingMemoId=null;document.getElementById('memoDeleteBtn').style.display='none';
+    document.getElementById('memoCategorySelect').value='personal';editingMemoId=null;if(memoDeleteBtn)memoDeleteBtn.style.display='none';
   }
   setTimeout(()=>document.getElementById('memoTitleInput').focus(),100);
 }
