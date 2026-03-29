@@ -227,6 +227,9 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
 <div class="ambient-bg"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
 
 <div class="app-container">
+  <div id="storageNotice" style="display:none;background:var(--accent-amber-dim);border:1px solid var(--accent-amber);border-radius:var(--radius-sm);padding:8px 14px;margin-bottom:12px;font-size:12px;color:var(--accent-amber);">
+    ⚠️ 이 환경에서는 데이터 저장이 제한될 수 있습니다. 새로고침 시 변경사항이 유지되지 않을 수 있습니다.
+  </div>
   <header class="header">
     <div class="logo-section">
       <div class="logo-icon">J</div>
@@ -492,8 +495,14 @@ updateClock();setInterval(updateClock,1000);
 // ==================== UTILS ====================
 function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
+// ==================== STORAGE UTILS ====================
+const _memStore=new Map();
+(function(){try{localStorage.setItem('__test__','1');localStorage.removeItem('__test__');}catch{const n=document.getElementById('storageNotice');if(n)n.style.display='block';}})();
+function safeGet(key,fallback){try{const r=localStorage.getItem(key);return r!==null?JSON.parse(r):fallback;}catch{return _memStore.has(key)?_memStore.get(key):fallback;}}
+function safeSet(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch{_memStore.set(key,value);}}
+
 // ==================== SETTINGS & SERVICE CONNECTIONS ====================
-let config=JSON.parse(localStorage.getItem('jangHQ_config')||'{}');
+let config=safeGet('jangHQ_config',{});
 
 function openSettings(){
   document.getElementById('settingsModal').classList.add('active');
@@ -505,7 +514,7 @@ function closeSettings(){document.getElementById('settingsModal').classList.remo
 function saveSettings(){
   config.calendarId=extractCalendarId(document.getElementById('settingsCalId').value||'');
   config.appleMusicUrl=extractAppleMusicUrl(document.getElementById('settingsAmUrl').value||'');
-  localStorage.setItem('jangHQ_config',JSON.stringify(config));
+  safeSet('jangHQ_config',config);
   closeSettings();
   applyConnections();
 }
@@ -592,11 +601,11 @@ function applyConnections(){
 applyConnections();
 
 // ==================== TODO ====================
-let todos=JSON.parse(localStorage.getItem('jangHQ_todos')||'[]');
+let todos=safeGet('jangHQ_todos',[]);
 // 구버전 데이터 마이그레이션 (done boolean → status string)
 todos=todos.map(t=>{if(t.status===undefined){t.status=t.done?'done':'active';delete t.done;if(!t.dueDate)t.dueDate='';}return t;});
 // 최초 1회만 샘플 데이터 생성 (사용자가 전부 삭제해도 재생성 안 함)
-if(!localStorage.getItem('jangHQ_todos_initialized')){
+if(!safeGet('jangHQ_todos_initialized',null)){
   if(!todos.length){
     todos=[
       {id:1,text:'보고서 제출',status:'active',priority:'high',dueDate:'2026-03-14'},
@@ -606,11 +615,11 @@ if(!localStorage.getItem('jangHQ_todos_initialized')){
       {id:5,text:'가족 사진 정리',status:'postponed',priority:'low',dueDate:''},
     ];
   }
-  localStorage.setItem('jangHQ_todos_initialized','1');
+  safeSet('jangHQ_todos_initialized','1');
 }
 saveTodos();
 let todoFilter='all', editingTodoId=null;
-function saveTodos(){localStorage.setItem('jangHQ_todos',JSON.stringify(todos));}
+function saveTodos(){safeSet('jangHQ_todos',todos);}
 function getDueDateLabel(dueDate){
   if(!dueDate)return null;
   const today=new Date();today.setHours(0,0,0,0);
@@ -713,9 +722,9 @@ function filterTodo(btn,f){document.querySelectorAll('.todo-filters .filter-btn'
 loadTodos();
 
 // ==================== MEMO ====================
-let memos=JSON.parse(localStorage.getItem('jangHQ_memos')||'[]');
+let memos=safeGet('jangHQ_memos',[]);
 // 최초 1회만 샘플 데이터 생성
-if(!localStorage.getItem('jangHQ_memos_initialized')){
+if(!safeGet('jangHQ_memos_initialized',null)){
   if(!memos.length){
     memos=[
       {id:1,title:'이번 주 업무 목표',body:'보고서 마감, 회의 준비, 일정 조율',category:'work',date:'2026-03-09'},
@@ -725,11 +734,11 @@ if(!localStorage.getItem('jangHQ_memos_initialized')){
     ];
     saveMemos();
   }
-  localStorage.setItem('jangHQ_memos_initialized','1');
+  safeSet('jangHQ_memos_initialized','1');
 }
 let memoFilter='all',editingMemoId=null;
 const memoDeleteBtn=document.getElementById('memoDeleteBtn');
-function saveMemos(){localStorage.setItem('jangHQ_memos',JSON.stringify(memos));}
+function saveMemos(){safeSet('jangHQ_memos',memos);}
 function loadMemos(){
   const list=document.getElementById('memoList');let f=memos;
   if(memoFilter!=='all')f=memos.filter(m=>m.category===memoFilter);
@@ -775,12 +784,12 @@ const defaultLinks=[
   {name:'운동 기록',desc:'루틴 & 기록',icon:'💪',color:'var(--accent-green-dim)',url:''},
   {name:'가족 앨범',desc:'사진 & 영상',icon:'📸',color:'var(--accent-blue-dim)',url:'https://photos.google.com'},
 ];
-let savedLinks=JSON.parse(localStorage.getItem('jangHQ_links')||'[]');
+let savedLinks=safeGet('jangHQ_links',[]);
 let quickLinks=savedLinks.length ? savedLinks.map(s=>{
   const d=defaultLinks.find(d=>d.name===s.name);
   return d ? {...d,...s,url:s.url||d.url} : s;
 }) : defaultLinks.map(d=>({...d}));
-localStorage.setItem('jangHQ_links',JSON.stringify(quickLinks));
+safeSet('jangHQ_links',quickLinks);
 function renderQuickLinks(){
   const grid=document.getElementById('quickLinksGrid');
   grid.innerHTML=quickLinks.map((l,i)=>`
@@ -804,7 +813,7 @@ function addQuickLink(){
   const url=prompt('URL (선택):') || '';
   const icon=prompt('아이콘 (이모지):') || '📌';
   quickLinks.push({name,desc:'',icon,color:'var(--accent-blue-dim)',url});
-  localStorage.setItem('jangHQ_links',JSON.stringify(quickLinks));
+  safeSet('jangHQ_links',quickLinks);
   renderQuickLinks();
 }
 renderQuickLinks();
