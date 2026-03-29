@@ -248,7 +248,7 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
           <div class="time-display" id="timeDisplayIQ"></div>
         </div>
       </div>
-      <button class="btn-icon settings-btn" onclick="openSettings()" title="설정">⚙️</button>
+      <button class="btn-icon settings-btn" id="headerSettingsBtn" aria-label="설정 열기" title="설정">⚙️</button>
     </div>
   </header>
 
@@ -258,8 +258,8 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
       <div class="card-header">
         <div class="card-title"><div class="icon" style="background:var(--accent-blue-dim);color:var(--accent-blue);">📅</div> Google 캘린더 <span class="status-dot disconnected" id="calStatus"></span></div>
         <div style="display:flex;gap:6px;">
-          <a id="calOpenBtn" href="https://calendar.google.com" target="_blank" class="btn-icon" title="Google 캘린더 열기" style="text-decoration:none;">↗</a>
-          <button class="btn-icon" onclick="openSettings()" title="설정">⚙️</button>
+          <a id="calOpenBtn" href="https://calendar.google.com" target="_blank" class="btn-icon" title="Google 캘린더 열기" aria-label="Google 캘린더 열기" style="text-decoration:none;">↗</a>
+          <button class="btn-icon" id="calSettingsBtn" aria-label="설정 열기" title="설정">⚙️</button>
         </div>
       </div>
       <div class="card-body">
@@ -280,15 +280,15 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
         <span style="font-size:12px;color:var(--text-muted);" id="todoCount">0/0</span>
       </div>
       <div class="todo-input-row">
-        <input type="text" class="todo-input" id="todoInput" placeholder="새 할 일 추가..." onkeypress="if(event.key==='Enter')addTodo()">
-        <button class="btn-add" onclick="addTodo()">추가</button>
+        <input type="text" class="todo-input" id="todoInput" placeholder="새 할 일 추가..." aria-label="새 할 일 입력">
+        <button class="btn-add" id="todoAddBtn">추가</button>
       </div>
       <div class="todo-filters">
-        <button class="filter-btn active" onclick="filterTodo(this,'all')">전체</button>
-        <button class="filter-btn" onclick="filterTodo(this,'active')">▶ 진행중</button>
-        <button class="filter-btn" onclick="filterTodo(this,'done')">✅ 완료</button>
-        <button class="filter-btn" onclick="filterTodo(this,'delayed')">⚠ 지연</button>
-        <button class="filter-btn" onclick="filterTodo(this,'postponed')">⏸ 연기</button>
+        <button class="filter-btn active" data-filter="all">전체</button>
+        <button class="filter-btn" data-filter="active">▶ 진행중</button>
+        <button class="filter-btn" data-filter="done">✅ 완료</button>
+        <button class="filter-btn" data-filter="delayed">⚠ 지연</button>
+        <button class="filter-btn" data-filter="postponed">⏸ 연기</button>
       </div>
       <ul class="todo-list" id="todoList"></ul>
     </div>
@@ -297,14 +297,14 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
     <div class="card memo-card">
       <div class="card-header">
         <div class="card-title"><div class="icon" style="background:var(--accent-purple-dim);color:var(--accent-purple);">📝</div> 메모</div>
-        <button class="btn-icon" onclick="openMemoEditor()" title="새 메모">＋</button>
+        <button class="btn-icon" id="newMemoBtn" aria-label="새 메모 작성" title="새 메모">＋</button>
       </div>
       <div class="card-body">
         <div class="memo-tabs">
-          <button class="memo-tab active" onclick="filterMemo(this,'all')">전체</button>
-          <button class="memo-tab" onclick="filterMemo(this,'personal')">개인</button>
-          <button class="memo-tab" onclick="filterMemo(this,'work')">업무</button>
-          <button class="memo-tab" onclick="filterMemo(this,'family')">가족</button>
+          <button class="memo-tab active" data-filter="all">전체</button>
+          <button class="memo-tab" data-filter="personal">개인</button>
+          <button class="memo-tab" data-filter="work">업무</button>
+          <button class="memo-tab" data-filter="family">가족</button>
         </div>
         <div class="memo-list" id="memoList"></div>
         <div class="memo-external-links">
@@ -319,8 +319,8 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
       <div class="card-header">
         <div class="card-title"><div class="icon" style="background:#fc3c4422;color:#fc3c44;">🍎</div> Apple Music <span class="status-dot disconnected" id="amStatus"></span></div>
         <div style="display:flex;gap:6px;">
-          <a href="https://music.apple.com" target="_blank" class="btn-icon" title="Apple Music 열기" style="text-decoration:none;">↗</a>
-          <button class="btn-icon" onclick="openSettings()" title="설정">⚙️</button>
+          <a href="https://music.apple.com" target="_blank" class="btn-icon" title="Apple Music 열기" aria-label="Apple Music 열기" style="text-decoration:none;">↗</a>
+          <button class="btn-icon" id="musicSettingsBtn" aria-label="설정 열기" title="설정">⚙️</button>
         </div>
       </div>
       <div class="card-body">
@@ -338,7 +338,7 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
     <div class="card files-card">
       <div class="card-header">
         <div class="card-title"><div class="icon" style="background:var(--accent-amber-dim);color:var(--accent-amber);">⚡</div> 바로가기</div>
-        <button class="btn-icon" onclick="addQuickLink()" title="추가">＋</button>
+        <button class="btn-icon" id="addQuickLinkBtn" aria-label="바로가기 추가" title="추가">＋</button>
       </div>
       <div class="card-body">
         <div class="quick-links-grid" id="quickLinksGrid"></div>
@@ -348,11 +348,11 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
 </div>
 
 <!-- SETTINGS MODAL -->
-<div class="modal-overlay" id="settingsModal">
+<div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-label="서비스 연결 설정">
   <div class="modal-content">
     <div class="modal-header">
       <span class="modal-header-title">⚙️ 서비스 연결 설정</span>
-      <button class="btn-icon" onclick="closeSettings()">✕</button>
+      <button class="btn-icon" id="settingsCloseBtn" aria-label="설정 닫기">✕</button>
     </div>
     <div class="modal-body">
       <!-- GOOGLE CALENDAR -->
@@ -380,18 +380,18 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-modal" onclick="closeSettings()">취소</button>
-      <button class="btn-modal primary" onclick="saveSettings()">저장 & 적용</button>
+      <button class="btn-modal" id="settingsCancelBtn">취소</button>
+      <button class="btn-modal primary" id="settingsSaveBtn">저장 & 적용</button>
     </div>
   </div>
 </div>
 
 <!-- TODO EDITOR MODAL -->
-<div class="modal-overlay" id="todoModal">
+<div class="modal-overlay" id="todoModal" role="dialog" aria-modal="true" aria-label="할 일 편집">
   <div class="modal-content" style="max-width:440px;">
     <div class="modal-header">
       <span class="modal-header-title">📋 할 일 편집</span>
-      <button class="btn-icon" onclick="closeTodoEditor()">✕</button>
+      <button class="btn-icon" id="todoCloseBtn" aria-label="할 일 편집 닫기">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
@@ -433,10 +433,10 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
       </div>
     </div>
     <div class="modal-footer" style="justify-content:space-between;">
-      <button class="btn-modal" style="border-color:var(--accent-rose);color:var(--accent-rose);display:none;" id="todoDeleteBtn" onclick="deleteTodoFromModal()">삭제</button>
+      <button class="btn-modal" style="border-color:var(--accent-rose);color:var(--accent-rose);display:none;" id="todoDeleteBtn">삭제</button>
       <div style="display:flex;gap:8px;">
-        <button class="btn-modal" onclick="closeTodoEditor()">취소</button>
-        <button class="btn-modal primary" onclick="saveTodoItem()">저장</button>
+        <button class="btn-modal" id="todoCancelBtn">취소</button>
+        <button class="btn-modal primary" id="todoSaveBtn">저장</button>
       </div>
     </div>
   </div>
@@ -447,7 +447,7 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
   <div class="modal-content" style="max-height:80vh;">
     <div class="modal-header">
       <input type="text" id="memoTitleInput" placeholder="메모 제목..." style="background:none;border:none;color:var(--text-primary);font-family:inherit;font-size:16px;font-weight:600;outline:none;flex:1;" aria-label="메모 제목">
-      <button class="btn-icon" onclick="closeMemoEditor()" aria-label="닫기">✕</button>
+      <button class="btn-icon" id="memoCloseBtn" aria-label="닫기">✕</button>
     </div>
     <div class="modal-body" style="flex:1;overflow-y:auto;">
       <textarea id="memoBodyInput" placeholder="내용을 입력하세요..." style="width:100%;min-height:250px;background:none;border:none;color:var(--text-primary);font-family:'Noto Sans KR',sans-serif;font-size:14px;line-height:1.8;resize:none;outline:none;"></textarea>
@@ -457,11 +457,11 @@ body { font-family: 'Outfit', 'Noto Sans KR', sans-serif; background: var(--bg-p
         <select id="memoCategorySelect" style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg-primary);color:var(--text-primary);font-family:inherit;font-size:12px;">
           <option value="personal">개인</option><option value="work">업무</option><option value="family">가족</option>
         </select>
-        <button class="btn-modal" style="border-color:var(--accent-rose);color:var(--accent-rose);display:none;" id="memoDeleteBtn" onclick="deleteMemo()">삭제</button>
+        <button class="btn-modal" style="border-color:var(--accent-rose);color:var(--accent-rose);display:none;" id="memoDeleteBtn">삭제</button>
       </div>
       <div style="display:flex;gap:8px;">
-        <button class="btn-modal" onclick="closeMemoEditor()">취소</button>
-        <button class="btn-modal primary" onclick="saveMemo()" style="background:var(--accent-purple);border-color:var(--accent-purple);">저장</button>
+        <button class="btn-modal" id="memoCancelBtn">취소</button>
+        <button class="btn-modal primary" id="memoSaveBtn" style="background:var(--accent-purple);border-color:var(--accent-purple);">저장</button>
       </div>
     </div>
   </div>
@@ -829,6 +829,37 @@ function addQuickLink(){
   renderQuickLinks();
 }
 renderQuickLinks();
+
+// ==================== BUTTON BINDINGS ====================
+document.getElementById('headerSettingsBtn')?.addEventListener('click',openSettings);
+document.getElementById('calSettingsBtn')?.addEventListener('click',openSettings);
+document.getElementById('musicSettingsBtn')?.addEventListener('click',openSettings);
+document.getElementById('newMemoBtn')?.addEventListener('click',()=>openMemoEditor());
+document.getElementById('addQuickLinkBtn')?.addEventListener('click',addQuickLink);
+document.getElementById('todoAddBtn')?.addEventListener('click',addTodo);
+document.getElementById('todoInput')?.addEventListener('keypress',e=>{if(e.key==='Enter')addTodo();});
+// Settings modal
+document.getElementById('settingsCloseBtn')?.addEventListener('click',closeSettings);
+document.getElementById('settingsCancelBtn')?.addEventListener('click',closeSettings);
+document.getElementById('settingsSaveBtn')?.addEventListener('click',saveSettings);
+// Todo modal
+document.getElementById('todoCloseBtn')?.addEventListener('click',closeTodoEditor);
+document.getElementById('todoDeleteBtn')?.addEventListener('click',deleteTodoFromModal);
+document.getElementById('todoCancelBtn')?.addEventListener('click',closeTodoEditor);
+document.getElementById('todoSaveBtn')?.addEventListener('click',saveTodoItem);
+// Memo modal
+document.getElementById('memoCloseBtn')?.addEventListener('click',closeMemoEditor);
+if(memoDeleteBtn)memoDeleteBtn.addEventListener('click',deleteMemo);
+document.getElementById('memoCancelBtn')?.addEventListener('click',closeMemoEditor);
+document.getElementById('memoSaveBtn')?.addEventListener('click',saveMemo);
+// Todo filter buttons
+document.querySelectorAll('.todo-filters .filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>filterTodo(btn,btn.dataset.filter));
+});
+// Memo tab buttons
+document.querySelectorAll('.memo-tabs .memo-tab').forEach(btn=>{
+  btn.addEventListener('click',()=>filterMemo(btn,btn.dataset.filter));
+});
 
 // ==================== KEYBOARD ====================
 document.addEventListener('keydown',e=>{
