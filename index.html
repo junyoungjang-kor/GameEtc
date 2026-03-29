@@ -519,15 +519,25 @@ function saveSettings(){
   applyConnections();
 }
 
+function isAllowedHost(url,allowedHosts){
+  try{const u=new URL(url);return allowedHosts.some(h=>u.hostname===h||u.hostname.endsWith('.'+h));}
+  catch{return false;}
+}
+
 function extractCalendarId(input){
   input=input.trim();
+  if(!input)return '';
   // Full embed URL: extract src= param
   const srcMatch=input.match(/[?&]src=([^&]+)/);
   if(srcMatch)return decodeURIComponent(srcMatch[1]);
   // Full calendar URL with /r or other paths
   const calMatch=input.match(/calendar\.google\.com.*[?&]src=([^&]+)/);
   if(calMatch)return decodeURIComponent(calMatch[1]);
-  // Already just an email
+  // URL 형식이지만 허용되지 않는 도메인
+  if(input.startsWith('http')&&!isAllowedHost(input,['calendar.google.com','google.com'])){
+    return '';
+  }
+  // Already just an email or calendar id
   return input;
 }
 
@@ -535,10 +545,11 @@ function extractAppleMusicUrl(input){
   input=input.trim();
   if(!input)return '';
   // 이미 embed URL이면 그대로 (이 체크를 먼저!)
-  if(input.includes('embed.music.apple.com'))return input;
+  if(isAllowedHost(input,['embed.music.apple.com']))return input;
   // music.apple.com → embed.music.apple.com
-  if(input.includes('music.apple.com')){
-    return input.replace('music.apple.com','embed.music.apple.com');
+  if(isAllowedHost(input,['music.apple.com'])){
+    try{const u=new URL(input);u.hostname='embed.music.apple.com';return u.toString();}
+    catch{return input.replace('music.apple.com','embed.music.apple.com');}
   }
   // Apple Music이 아닌 URL은 거부
   alert('Apple Music 링크만 입력할 수 있습니다.\n예: https://music.apple.com/kr/playlist/...');
@@ -587,6 +598,7 @@ function applyConnections(){
     iframe.setAttribute('frameborder','0');
     iframe.setAttribute('allow','autoplay *; encrypted-media *; fullscreen *; clipboard-write');
     iframe.setAttribute('sandbox','allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation');
+    iframe.onerror=()=>{amPlaceholder.style.display='';amPlaceholder.querySelector('.placeholder-text').innerHTML='Apple Music을 불러올 수 없습니다<br>URL을 다시 확인하거나<br><a href="https://music.apple.com" target="_blank" style="color:var(--accent-blue);">Apple Music에서 직접 열기 →</a>';};
     amWrap.appendChild(iframe);
     amStatus.className='status-dot connected';
   } else {
